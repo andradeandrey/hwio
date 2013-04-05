@@ -9,10 +9,16 @@ type PinIOMode int
 
 // The modes for PinMode.
 const (
-	INPUT PinIOMode = iota
-	OUTPUT
-	INPUT_PULLUP
-	INPUT_PULLDOWN
+	INPUT PinIOMode = iota // input with no resistor
+
+	OUTPUT // straight output (GPIO)
+
+	INPUT_PULLUP // input with pull up resistor
+
+	INPUT_PULLDOWN // input with pull down resistor
+
+	SPI_CLOCK // SPI clock pin, which can be assigned to the clock of an SPI port.
+
 	// @todo PinIOMode consider an input_analog mode for analog pins. Not an issue on beaglebone,
 	// @todo    but could be an issue on devices that support digital and analog input on the same pin,
 	// @todo    if such devices exist.
@@ -29,6 +35,8 @@ func (mode PinIOMode) String() string {
 		return "INPUT_PULLUP"
 	case INPUT_PULLDOWN:
 		return "INPUT_PULLDOWN"
+	case SPI_CLOCK:
+		return "SPI_CLOCK"
 	}
 	return ""
 }

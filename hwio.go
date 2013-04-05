@@ -7,9 +7,9 @@ package hwio
 import (
 	"errors"
 	"fmt"
-	"time"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type BitShiftOrder byte
@@ -115,7 +115,7 @@ func GetDefinedPins() HardwarePinMap {
 // @todo GetPin: consider allowing an int or int as string to identify logical pin directly
 func GetPin(cname string) (Pin, error) {
 	for pin, pinDef := range definedPins {
-		for _,name := range pinDef.hwPinRefs {
+		for _, name := range pinDef.hwPinRefs {
 			if name == cname {
 				return pin, nil
 			}
@@ -163,6 +163,8 @@ func checkPinMode(mode PinIOMode, pd *PinDef) (e error) {
 		ok = pd.HasCapability(CAP_INPUT_PULLUP)
 	case INPUT_PULLDOWN:
 		ok = pd.HasCapability(CAP_INPUT_PULLDOWN)
+	case SPI_CLOCK:
+		ok = pd.HasCapability(CAP_SPI_CLOCK)
 	}
 	if ok {
 		return nil
@@ -312,6 +314,25 @@ func ShiftOutSize(dataPin Pin, clockPin Pin, value uint, order BitShiftOrder, n 
 		DigitalWrite(clockPin, LOW)
 	}
 	return nil
+}
+
+// Write data via SPI. 'port' is actually the SCLK pin of the SPI port. hwio
+// convention is that when we set up the SCLK pin, the driver will also set up
+// the other SPI pins of that port. So we can just refer to the whole SPI
+// port by it's SCLK pin. We write 'nBits' of data from 'value'. 'sel' 
+// determines the SS/CE used (driver-dependent).
+func SPIWrite(port Pin, value uint, nBits int, sel uint) error {
+
+}
+
+// Check if data is available from the SPI port.
+func SPIDataAvailable(port Pin) (bool, error) {
+
+}
+
+// Read a value from the SPI port. An error is returned if no value is returned.
+func SPIRead(port Pin) (uint, error) {
+
 }
 
 // def toggle(gpio_pin):
