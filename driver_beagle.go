@@ -238,6 +238,7 @@ var beaglePins []*BeaglePin
 var bbGpioProfile []Capability
 var bbAnalogInProfile []Capability
 var bbUsrLedProfile []Capability
+var bbGpioSPIProfile []Capability
 
 //	analog := []Capability {CAP_INPUT,CAP_OUTPUT,CAP_ANALOG_IN}
 //	pwm := []Capability {CAP_INPUT,CAP_OUTPUT,CAP_PWM}
@@ -259,6 +260,13 @@ func init() {
 	}
 	bbUsrLedProfile = []Capability{
 		CAP_OUTPUT,
+	}
+	bbGpioSPIProfile = []Capability{
+		CAP_OUTPUT,
+		CAP_INPUT,
+		CAP_INPUT_PULLUP,
+		CAP_INPUT_PULLDOWN,
+		CAP_SPI,
 	}
 
 	p := []*BeaglePin{
@@ -319,7 +327,7 @@ func init() {
 		makeBeaglePin("P9.19", bbGpioProfile, "GPIO0_13", BB_GPIO0, 1<<13, "uart1_rtsn", 0),
 		makeBeaglePin("P9.20", bbGpioProfile, "GPIO0_12", BB_GPIO0, 1<<12, "uart1_ctsn", 0),
 		makeBeaglePin("P9.21", bbGpioProfile, "GPIO0_3", BB_GPIO0, 1<<3, "spi0_d0", 0),
-		makeBeaglePin("P9.22", bbGpioProfile, "GPIO0_2", BB_GPIO0, 1<<2, "spi0_sclk", 0),
+		makeBeaglePin("P9.22", bbGpioSPIProfile, "GPIO0_2", BB_GPIO0, 1<<2, "spi0_sclk", 0),
 		makeBeaglePin("P9.23", bbGpioProfile, "GPIO1_17", BB_GPIO1, 1<<17, "gpmc_a1", 0),
 		makeBeaglePin("P9.24", bbGpioProfile, "GPIO0_15", BB_GPIO0, 1<<15, "uart1_txd", 0),
 		makeBeaglePin("P9.25", bbGpioProfile, "GPIO3_21", BB_GPIO3, 1<<21, "mcasp0_ahclkx", 0),

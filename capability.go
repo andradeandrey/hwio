@@ -15,7 +15,7 @@ const (
 	CAP_INPUT_PULLDOWN                   // digital input with pull down
 	CAP_PWM                              // "analog" output using pwm
 	CAP_ANALOG_IN                        // analog input using A/D converter
-	CAP_SPI_CLOCK                        //	SPI clock
+	CAP_SPI                              //	SPI clock
 )
 
 // This represents a set of capabilities that a pin may have. There may be multiple pins on a device that have identical
@@ -36,8 +36,8 @@ func (c Capability) String() string {
 		return "pwm"
 	case CAP_ANALOG_IN:
 		return "analog_in"
-	case CAP_SPI_CLOCK:
-		return "spi_sclk"
+	case CAP_SPI:
+		return "spi"
 	}
 	return ""
 }

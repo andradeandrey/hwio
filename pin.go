@@ -17,7 +17,7 @@ const (
 
 	INPUT_PULLDOWN // input with pull down resistor
 
-	SPI_CLOCK // SPI clock pin, which can be assigned to the clock of an SPI port.
+	SPI // SPI clock pin, which can be assigned to the clock of an SPI port.
 
 	// @todo PinIOMode consider an input_analog mode for analog pins. Not an issue on beaglebone,
 	// @todo    but could be an issue on devices that support digital and analog input on the same pin,
@@ -35,8 +35,8 @@ func (mode PinIOMode) String() string {
 		return "INPUT_PULLUP"
 	case INPUT_PULLDOWN:
 		return "INPUT_PULLDOWN"
-	case SPI_CLOCK:
-		return "SPI_CLOCK"
+	case SPI:
+		return "SPI"
 	}
 	return ""
 }
