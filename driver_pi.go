@@ -209,7 +209,7 @@ func (d *RaspberryPiDriver) Close() {
 	syscall.Munmap(d.gpioMmap)
 }
 
-func (d *RaspberryPiDriver) PinMode(pin Pin, mode PinIOMode) error {
+func (d *RaspberryPiDriver) PinMode(pin Pin, mode PinIOMode) (assigned []Pin, e error) {
 	p := piPins[pin]
 
 	if mode == OUTPUT {
@@ -236,7 +236,9 @@ func (d *RaspberryPiDriver) PinMode(pin Pin, mode PinIOMode) error {
 		d.gpioMem[PI_GPPUD] = 0
 		d.gpioMem[PI_GPPUDCLK0] = 0
 	}
-	return nil
+	result := make([]Pin, 0)
+	result = append(result, pin)
+	return result, nil
 
 	/*
 		void pinModeGpio (int pin, int mode)

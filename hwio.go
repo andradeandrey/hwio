@@ -131,6 +131,8 @@ func SetErrorChecking(check bool) {
 
 // Set the mode of a pin. Analogous to Arduino pin mode.
 func PinMode(pin Pin, mode PinIOMode) (e error) {
+	// If error checking, first check the request against what we know to be assigned, and what modes are actually
+	// supported of the requested pin.
 	if errorChecking {
 		if e = assertDriver(); e != nil {
 			return
@@ -144,12 +146,20 @@ func PinMode(pin Pin, mode PinIOMode) (e error) {
 		if e = checkPinMode(mode, pd); e != nil {
 			return
 		}
-
-		// assign this pin
-		assignedPins[pin] = &assignedPin{pinDef: pd, pinIOMode: mode}
 	}
 
-	return driver.PinMode(pin, mode)
+	// Get the driver to actually assign
+	pins, e := driver.PinMode(pin, mode)
+
+	if errorChecking {
+		// assign all the pins the driver told us were assigned. There may be more pins than
+		// we asked for, where we're requesting multi-pin hardware modules.
+		for _, p := range pins {
+			assignedPins[p] = &assignedPin{pinDef: definedPins[p], pinIOMode: mode}
+		}
+	}
+
+	return
 }
 
 func checkPinMode(mode PinIOMode, pd *PinDef) (e error) {
@@ -322,17 +332,17 @@ func ShiftOutSize(dataPin Pin, clockPin Pin, value uint, order BitShiftOrder, n 
 // port by it's SCLK pin. We write 'nBits' of data from 'value'. 'sel' 
 // determines the SS/CE used (driver-dependent).
 func SPIWrite(port Pin, value uint, nBits int, sel uint) error {
-
+	return errors.New("SPIWrite not implemented")
 }
 
 // Check if data is available from the SPI port.
 func SPIDataAvailable(port Pin) (bool, error) {
-
+	return false, errors.New("SPIDataAvailable not implemented")
 }
 
 // Read a value from the SPI port. An error is returned if no value is returned.
 func SPIRead(port Pin) (uint, error) {
-
+	return 0, errors.New("SPIRead not implemented")
 }
 
 // def toggle(gpio_pin):
@@ -369,8 +379,10 @@ type HardwareDriver interface {
 	// Initialise the driver after creation
 	Init() (e error)
 
-	// Set mode of a pin
-	PinMode(pin Pin, mode PinIOMode) (e error)
+	// Set mode of a pin. It returns a map of pins actually assigned. For GPIO this is just the pin that was
+	// asked for, but for some multi-pin modules (e.g. SPI, I2C) allocating the clock pin will effectively
+	// block all pins that the hardware assigns.
+	PinMode(pin Pin, mode PinIOMode) (assigned []Pin, e error)
 
 	// Write digital output
 	DigitalWrite(pin Pin, value int) error

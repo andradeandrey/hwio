@@ -399,21 +399,25 @@ func (d *BeagleBoneDriver) Close() {
 	syscall.Munmap(d.mmap)
 }
 
-func (d *BeagleBoneDriver) PinMode(pin Pin, mode PinIOMode) error {
+func (d *BeagleBoneDriver) PinMode(pin Pin, mode PinIOMode) ([]Pin, error) {
 	p := beaglePins[pin]
+
+	// Set up default result set of pins, which will always include the pin we asked for
+	result := make([]Pin, 0)
+	result = append(result, pin)
 
 	// handle analog first, they are simplest from PinMode perspective
 	if p.isAnalogPin() {
 		if mode != INPUT {
-			return errors.New(fmt.Sprintf("Pin %d is an analog pin, and the mode must be INPUT", p))
+			return nil, errors.New(fmt.Sprintf("Pin %d is an analog pin, and the mode must be INPUT", p))
 		}
-		return nil // nothing to set up
+		return result, nil // nothing to set up
 	}
 
 	if mode == OUTPUT {
 		e := d.pinMux(p.mode0Name, BB_CONF_GPIO_OUTPUT)
 		if e != nil {
-			return e
+			return nil, e
 		}
 
 		d.clearRegL(p.port+uint(BB_GPIO_OE), p.bit)
@@ -428,7 +432,7 @@ func (d *BeagleBoneDriver) PinMode(pin Pin, mode PinIOMode) error {
 
 		e := d.pinMux(p.mode0Name, BB_CONF_GPIO_INPUT|uint(pull))
 		if e != nil {
-			return e
+			return nil, e
 		}
 
 		//		fmt.Printf("R/W dir reg BEFORE value is %x\n", d.getRegL(p.port+uint(GPIO_OE)))
@@ -436,7 +440,7 @@ func (d *BeagleBoneDriver) PinMode(pin Pin, mode PinIOMode) error {
 		d.orRegL(p.port+uint(BB_GPIO_OE), p.bit)
 		//		fmt.Printf("R/W dir reg AFTER value is %x\n", d.getRegL(p.port+uint(GPIO_OE)))
 	}
-	return nil
+	return result, nil
 }
 
 func (d *BeagleBoneDriver) pinMux(mux string, mode uint) error {
